@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic RAG Schedule Assistant</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 22px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #1d4ed8;
+        }
+
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .example {
+            border: 1px solid #dbeafe;
+            background: #eff6ff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .example:hover {
+            background: #dbeafe;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #queryInput {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #queryInput:focus {
+            border-color: #2563eb;
+        }
+
+        button {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 15px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        #response {
+            margin-top: 20px;
+            padding: 18px;
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            min-height: 70px;
+        }
+
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .tool {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .tool h3 {
+            margin-top: 0;
+            color: #111827;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+            .input-area {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Agentic RAG Schedule Assistant</h1>
+        <p>Manage your 30-day schedule using natural language</p>
+    </div>
+
+    <div class="container">
+
+        <div class="card">
+            <h2>Ask Your Schedule Assistant</h2>
+
+            <div class="input-area">
+                <input
+                    type="text"
+                    id="queryInput"
+                    placeholder="Example: What do I have scheduled tomorrow?"
+                >
+                <button onclick="sendQuery()">Ask Assistant</button>
+            </div>
+
+            <div id="loading">Processing your request...</div>
+
+            <div id="response">
+                Your answer will appear here.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Example Queries</h2>
+
+            <div class="examples">
+
+                <div class="example" onclick="setQuery('What do I have scheduled tomorrow?')">
+                    What do I have scheduled tomorrow?
+                </div>
+
+                <div class="example" onclick="setQuery('Am I free Friday afternoon?')">
+                    Am I free Friday afternoon?
+                </div>
+
+                <div class="example" onclick="setQuery('Add a meeting on August 15 at 3 PM')">
+                    Add a meeting on August 15 at 3 PM
+                </div>
+
+                <div class="example" onclick="setQuery('Move my meeting from 2 PM to 4 PM')">
+                    Move my meeting from 2 PM to 4 PM
+                </div>
+
+                <div class="example" onclick="setQuery('Show my schedule for the next 7 days')">
+                    Show my schedule for the next 7 days
+                </div>
+
+                <div class="example" onclick="setQuery('Remove my appointment tomorrow')">
+                    Remove my appointment tomorrow
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Agent Tools</h2>
+
+            <div class="tools">
+
+                <div class="tool">
+                    <h3>get_schedule</h3>
+                    <p>
+                        Retrieves relevant schedule information using
+                        dates, times, events, or natural-language queries.
+                    </p>
+                </div>
+
+                <div class="tool">
+                    <h3>update_schedule</h3>
+                    <p>
+                        Adds, updates, or removes schedule entries
+                        according to the user's request.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Agentic RAG Schedule Assistant | FastAPI + ChromaDB
+    </div>
+
+    <script>
+        function setQuery(text) {
+            document.getElementById("queryInput").value = text;
+            document.getElementById("queryInput").focus();
+        }
+
+        async function sendQuery() {
+            const input = document.getElementById("queryInput");
+            const responseBox = document.getElementById("response");
+            const loading = document.getElementById("loading");
+
+            const query = input.value.trim();
+
+            if (!query) {
+                responseBox.textContent = "Please enter a question or request.";
+                return;
+            }
+
+            loading.style.display = "block";
+            responseBox.textContent = "";
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        query: query
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Server returned an error."
+                    );
+                }
+
+                let answer = "";
+
+                if (typeof data === "string") {
+                    answer = data;
+                } else if (data.response) {
+                    answer = data.response;
+                } else if (data.answer) {
+                    answer = data.answer;
+                } else if (data.message) {
+                    answer = data.message;
+                } else {
+                    answer = JSON.stringify(data, null, 2);
+                }
+
+                responseBox.textContent = answer;
+
+            } catch (error) {
+                responseBox.textContent =
+                    "Error connecting to the Schedule Assistant.\n\n" +
+                    error.message;
+            } finally {
+                loading.style.display = "none";
+            }
+        }
+
+        document.getElementById("queryInput").addEventListener(
+            "keydown",
+            function(event) {
+                if (event.key === "Enter") {
+                    sendQuery();
+                }
+            }
+        );
+    </script>
+
+</body>
+</html>
