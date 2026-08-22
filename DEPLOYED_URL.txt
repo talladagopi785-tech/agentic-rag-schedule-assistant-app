@@ -1,0 +1,9 @@
+DEPLOYED_URL
+=============
+Not deployed yet.
+
+After you connect this GitHub repository to Render and the first deploy succeeds, replace this line with the URL Render gives you, for example:
+https://agentic-rag-schedule-assistant.onrender.com/
+
+Swagger API:
+https://agentic-rag-schedule-assistant.onrender.com/docs
